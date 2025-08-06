@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Blog to PDF Converter</title>
+</head>
+<body style="font-family: Arial; text-align: center; padding: 40px;">
+  <h1>📰 Blog to PDF Converter</h1>
+  <form id="convertForm">
+    <input
+      type="url"
+      id="blogUrl"
+      name="blogUrl"
+      placeholder="Enter Blog URL"
+      required
+      style="padding: 10px; width: 60%;"
+    />
+    <br /><br />
+    <button type="submit" style="padding: 10px 20px;">Convert to PDF</button>
+  </form>
+  <p id="status" style="margin-top: 20px;"></p>
+
+  <script>
+    const form = document.getElementById("convertForm");
+    const statusText = document.getElementById("status");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const url = document.getElementById("blogUrl").value;
+      statusText.innerText = "Converting...";
+      
+      const response = await fetch("/convert", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        link.download = "blog.pdf";
+        link.click();
+        statusText.innerText = "✅ PDF downloaded!";
+      } else {
+        statusText.innerText = "❌ Conversion failed. Try another URL.";
+      }
+    });
+  </script>
+</body>
+</html>
